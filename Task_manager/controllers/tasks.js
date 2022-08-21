@@ -1,5 +1,6 @@
 const Task = require('../models/Task');
 const asyncWrapper = require('../middleware/async');
+const { createCustomerError } = require('../errors/custom-error');
 
 
 
@@ -18,7 +19,7 @@ const getTask = asyncWrapper (async (req, res) => {
         const task = await Task.findOne({_id: taskID});
         console.log(task);
         if(!task) {
-            return res.status(404).json({msg: `No task with id  ${taskID}`});
+            return next(createCustomerError(`No task with id  ${taskID}`));            
         }
         res.status(200).json(task);    
 });
@@ -30,10 +31,7 @@ const updateTask = asyncWrapper (async (req, res) => {
             runValidators: true
         });
         if(!task) {
-            const error = new Error('Not Found');
-            error.status = 404
-            return next(error)
-           // res.status(500).json({msg: `No task found with id : ${taskID}`});
+             return next(createCustomerError(`No task with id  ${taskID}`));
         }
         res.status(200).json(task);        
 });
